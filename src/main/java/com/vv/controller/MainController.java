@@ -1,6 +1,8 @@
 package com.vv.controller;
 
-import com.vv.sandbox.impl.JavaNativeCodeSandbox;
+import com.vv.sandbox.CodeSandbox;
+import com.vv.sandbox.CodeSandboxFactory;
+import com.vv.sandbox.impl.local.JavaNativeCodeSandbox;
 import com.vv.model.ExecuteCodeRequest;
 import com.vv.model.ExecuteCodeResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +23,7 @@ public class MainController {
     private static final String AUTH_REQUEST_SECRET = "secretKey";
 
     @Resource
-    private JavaNativeCodeSandbox javaNativeCodeSandbox;
+    private CodeSandboxFactory codeSandboxFactory;
 
     @GetMapping("/health")
     public String healthCheck() {
@@ -46,6 +48,8 @@ public class MainController {
         if (executeCodeRequest == null) {
             throw new RuntimeException("请求参数为空");
         }
-        return javaNativeCodeSandbox.executeCode(executeCodeRequest);
+        String language = executeCodeRequest.getLanguage();
+        CodeSandbox codeSandbox = codeSandboxFactory.getCodeSandbox(language);
+        return codeSandbox.executeCode(executeCodeRequest);
     }
 }

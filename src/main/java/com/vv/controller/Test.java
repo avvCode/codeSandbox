@@ -4,10 +4,9 @@ import com.google.common.collect.Lists;
 
 import com.vv.model.ExecuteCodeRequest;
 import com.vv.model.ExecuteCodeResponse;
-import com.vv.sandbox.impl.JavaNativeCodeSandbox;
+import com.vv.sandbox.impl.local.JavaNativeCodeSandbox;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 /**
  * @author vv
@@ -21,5 +20,6 @@ public class Test {
         executeCodeRequest.setCode(code);
         executeCodeRequest.setLanguage("java");
         ExecuteCodeResponse executeCodeResponse = javaNativeCodeSandbox.executeCode(executeCodeRequest);
+        System.out.println(executeCodeResponse);
     }
 }

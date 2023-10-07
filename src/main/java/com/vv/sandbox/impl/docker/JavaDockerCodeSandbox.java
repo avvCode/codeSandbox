@@ -1,4 +1,4 @@
-package com.vv.sandbox.impl;
+package com.vv.sandbox.impl.docker;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -11,7 +11,7 @@ import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.vv.model.ExecuteCodeRequest;
 import com.vv.model.ExecuteCodeResponse;
 import com.vv.model.ExecuteMessage;
-import com.vv.sandbox.JavaCodeSandboxTemplate;
+import com.vv.sandbox.template.JavaCodeSandboxTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -46,16 +46,14 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
 
     /**
      * 3、创建容器，把文件复制到容器内
-     * @param userCodeFile
      * @param inputList
      * @return
      */
     @Override
-    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList) {
-        String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
+    public List<ExecuteMessage> runFile(File userCodeFile, String runCmdPrefix, List<String> inputList) {
         // 获取默认的 Docker Client
         DockerClient dockerClient = DockerClientBuilder.getInstance().build();
-
+        String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
         // 拉取镜像
         String image = "openjdk:8-alpine";
         if (FIRST_INIT) {

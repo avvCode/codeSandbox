@@ -1,9 +1,9 @@
-package com.vv.sandbox.impl;
+package com.vv.sandbox.impl.local;
 
 
 import com.vv.model.ExecuteCodeRequest;
 import com.vv.model.ExecuteCodeResponse;
-import com.vv.sandbox.JavaCodeSandboxTemplate;
+import com.vv.sandbox.template.JavaCodeSandboxTemplate;
 import org.springframework.stereotype.Component;
 
 /**

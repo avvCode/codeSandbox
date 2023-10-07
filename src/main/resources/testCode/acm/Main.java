@@ -4,6 +4,6 @@ public class Main {
         Scanner input = new Scanner(System.in);
         int a = input.nextInt();
         int b = input.nextInt();
-        System.out.println("结果：" + (a + b));
+        System.out.println(a + b);
     }
 }
