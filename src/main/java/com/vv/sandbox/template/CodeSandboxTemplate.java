@@ -20,11 +20,24 @@ import java.util.UUID;
  */
 public abstract class CodeSandboxTemplate {
 
-    public String globalCodeDirName;
+    /**
+     * 存放临时代码文件夹
+     */
+    public static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    public String globalCodeName;
+    /**
+     * 代码文件前缀 main
+     */
+    public static final String codeFilePrefix = "main";
+
+    /**
+     * 代码文件后缀 .class .cpp .c ...
+     */
+    public String codeFileSuffix;
 
     public Long timeOut;
+
+
 
     /**
      * 1. 把用户的代码保存为文件
@@ -34,7 +47,7 @@ public abstract class CodeSandboxTemplate {
      */
     public File saveCodeToFile(String code) {
         String userDir = System.getProperty("user.dir");
-        String globalCodePathName = userDir + File.separator + globalCodeDirName;
+        String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
         // 判断全局代码目录是否存在，没有则新建
         if (!FileUtil.exist(globalCodePathName)) {
             FileUtil.mkdir(globalCodePathName);
@@ -42,7 +55,7 @@ public abstract class CodeSandboxTemplate {
 
         // 把用户的代码隔离存放
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
-        String userCodePath = userCodeParentPath + File.separator + globalCodeName;
+        String userCodePath = userCodeParentPath + File.separator + codeFilePrefix + codeFileSuffix;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
         return userCodeFile;
     }
@@ -52,8 +65,7 @@ public abstract class CodeSandboxTemplate {
      *
      * @return
      */
-    public ExecuteMessage compileFile(File userCodeFile,String compileCmdPrefix) {
-        String compileCmd = String.format(compileCmdPrefix, userCodeFile.getAbsolutePath());
+    public  ExecuteMessage compileFile(File userCodeFile,String compileCmd){
         try {
             Process compileProcess = Runtime
                     .getRuntime()
@@ -75,11 +87,7 @@ public abstract class CodeSandboxTemplate {
      * @param inputList
      * @return
      */
-    public List<ExecuteMessage> runFile(File userCodeFile, String runCmdPrefix, List<String> inputList) {
-
-        String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
-
-        String runCmd = String.format(runCmdPrefix, userCodeParentPath);
+    public List<ExecuteMessage> runFile(File userCodeFile, String runCmd, List<String> inputList) {
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
             try {

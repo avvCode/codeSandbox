@@ -4,9 +4,11 @@ import com.vv.model.ExecuteCodeRequest;
 import com.vv.model.ExecuteCodeResponse;
 import com.vv.model.ExecuteMessage;
 import com.vv.sandbox.CodeSandbox;
+import com.vv.utils.ProcessUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,20 +16,16 @@ import java.util.List;
  */
 @Slf4j
 public class CppCodeSandboxTemple extends CodeSandboxTemplate implements CodeSandbox {
-    private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
-
-    private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
-
-    private static final long TIME_OUT = 5000L;
-
-    private static final String COMPIlE_CMD = "javac -encoding utf-8 %s";
-    private static final String RUN_CMD = "java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main";
+    private static final long TIME_OUT = 1000L;
+    private static final String CODE_FILE_SUFFIX = ".cpp";
+    private static final String CODE_FILE_PREFIX = "main";
+    private static final String COMPIlE_CMD_FORMAT = "g++ -finput-charset=UTF-8 -fexec-charset=UTF-8 %s -o %s";
+    private static final String RUN_CMD_FORMAT = CODE_FILE_PREFIX;
 
 
     public CppCodeSandboxTemple() {
-        super.globalCodeDirName = GLOBAL_CODE_DIR_NAME;
+        super.codeFileSuffix = CODE_FILE_SUFFIX;
         super.timeOut = TIME_OUT;
-        super.globalCodeName = GLOBAL_JAVA_CLASS_NAME;
     }
 
     @Override
@@ -40,15 +38,15 @@ public class CppCodeSandboxTemple extends CodeSandboxTemplate implements CodeSan
             File userCodeFile = saveCodeToFile(code);
 
             //2. 编译代码，得到 class 文件
-
-
-            ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile,COMPIlE_CMD);
+            String userCodePath = userCodeFile.getAbsolutePath();
+            String compileCmd = String.format(COMPIlE_CMD_FORMAT,userCodePath, userCodePath.substring(0, userCodePath.length() - 4));
+            ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile,compileCmd);
 
             System.out.println(compileFileExecuteMessage);
 
-
             // 3. 执行代码，得到输出结果
-            List<ExecuteMessage> executeMessageList = runFile(userCodeFile,RUN_CMD, inputList);
+            String runCmd = userCodeFile.getParentFile() + File.separator + RUN_CMD_FORMAT;
+            List<ExecuteMessage> executeMessageList = runFile(userCodeFile,runCmd, inputList);
 
             //4. 收集整理输出结果
             ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
@@ -56,7 +54,7 @@ public class CppCodeSandboxTemple extends CodeSandboxTemplate implements CodeSan
             //5. 文件清理
             boolean b = deleteFile(userCodeFile);
             if (!b) {
-                log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
+                log.error("deleteFile error, userCodeFilePath = {}", userCodePath);
             }
             return outputResponse;
         } catch (Exception e) {
